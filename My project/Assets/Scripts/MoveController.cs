@@ -11,6 +11,7 @@ public class MoveController : MonoBehaviour
     [Header("플레이어 이동 및 점프")]
     Rigidbody2D rigid;//null
     CapsuleCollider2D coll;
+    BoxCollider2D box2d;
     Animator anim;//null
     Vector3 moveDir;//0, 0, 0
     float verticalVelocity = 0f;//수직으로 떨어지는 힘
@@ -20,10 +21,13 @@ public class MoveController : MonoBehaviour
 
     [SerializeField] bool showGroundCheck;
     [SerializeField] float groundCheckLength;//이 길이가 게임에서 얼마만큼의 길이로 나오는지 육안으로 보기전까지는 알 수가 없음
+
     [SerializeField] Color colorGroundCheck;
 
     [SerializeField] bool isGround;//인스펙터에서 플레이어가 플랫폼타일에 착지 했는지
     bool isJump;
+
+    Camera camMain;
 
     private void OnDrawGizmos()//체크의 용도
     {
@@ -36,7 +40,6 @@ public class MoveController : MonoBehaviour
             //Gizmos.color = colorGroundCheck;
             //Gizmos.DrawWireSphere(transform.position, sphereRange);
             //Gizmos.DrawWireCube(transform.position, cubeSize);
-            
         }
 
         //Debug.DrawLine(); 디버그도 체크용도로 씬 카메라에 선을 그려줄 수 있음
@@ -47,23 +50,24 @@ public class MoveController : MonoBehaviour
     private void Awake()
     {
         rigid = GetComponent<Rigidbody2D>();
+        box2d = GetComponent<BoxCollider2D>();
         anim = GetComponent<Animator>();
     }
 
     void Start()
     {
-        
+        camMain = Camera.main;
     }
     void Update()
     {
         checkGround();
 
         moving();
+        checkAim();
+        doAnim();
         jump();
 
         chedkGravity();
-
-        doAnim();
     }
 
     private void checkGround()
@@ -80,9 +84,13 @@ public class MoveController : MonoBehaviour
         //Layer의 int와 공통적으로 활용하는 int와 다름
         //Wall Layer, Ground Layer
         RaycastHit2D hit = 
-        Physics2D.Raycast(transform.position, Vector2.down, groundCheckLength, LayerMask.GetMask("Ground")); //최초 위치로 부터(origin), 방향(direction), Vector2.donw == new vcetor(0, -1)
+        //Physics2D.Raycast(transform.position, Vector2.down, groundCheckLength, LayerMask.GetMask("Ground")); //최초 위치로 부터(origin), 방향(direction), Vector2.donw == new vcetor(0, -1)
 
-        if(hit)//Raycast Ray가 닿았다면 true
+       
+
+        Physics2D.BoxCast(box2d.bounds.center, box2d.bounds.size, 0f, Vector2.down, groundCheckLength, LayerMask.GetMask("Ground"));
+
+        if (hit)//Raycast Ray가 닿았다면 true
         {
             isGround = true;
         }
@@ -95,6 +103,43 @@ public class MoveController : MonoBehaviour
         moveDir.y = rigid.velocity.y;
         //슈팅게임 만들떄는 오브젝트를 코드에 의해서 순간이동 하게 만들었지만 이번에는 물리에 의해서 이동     
         rigid.velocity = moveDir;//y 0 Time.deltaTime
+    }
+
+    private void checkAim()
+    {
+        //방향키에 따른 플레이어 애니메이션 방향
+        //Vector3 scale = transform.localScale;
+        //if (moveDir.x < 0 && scale.x != 1.0f)//왼쪽
+        //{
+        //    scale.x = 1.0f;
+        //    transform.localScale = scale;
+        //    Debug.Log("<color=blue>동작</color>");
+        //}
+        //else if (moveDir.x > 0 && scale.x != -1.0f)//오른쪽 
+        //{
+        //    scale.x = -1.0f;
+        //    transform.localScale = scale;
+        //    Debug.Log("<color=rad>동작</color>");
+        //}      
+
+        //마우스커서에 따른 플레이어 애니메이션 방향
+        //WorldPoint로 하지 않을 시 캔버스 기준으로 좌표를 찍음
+        //WorldPoint의 경우 정중앙이 x 0 y 0으로 찍힘
+        Vector2 mouseWorldPos = camMain.ScreenToWorldPoint(Input.mousePosition);
+        Vector2 playerPos = transform.position;
+        Vector2 fixedPos = mouseWorldPos - playerPos;
+
+        Vector3 plalyerScale = transform.localScale;
+        if (fixedPos.x > 0 && plalyerScale.x != -1.0f)
+        {
+            plalyerScale.x = -1.0f;
+        }
+        else if (fixedPos.x < 0 && plalyerScale.x != 1.0f)
+        {
+            plalyerScale.x = 1.0f;
+        }
+        transform.localScale = plalyerScale;
+
     }
 
     private void jump()
