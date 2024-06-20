@@ -1,8 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
-using UnityEditor;
-using System;
+using UnityEngine.UI;
 
 public class MoveController : MonoBehaviour
 {
@@ -39,12 +39,22 @@ public class MoveController : MonoBehaviour
     [SerializeField] private float dashTime = 0.3f;
     [SerializeField] private float dashSpeed = 20.0f;
     float dashTimer = 0.0f;//타이머
-    //대시이펙트
+    TrailRenderer dashEffect;//null
+    [SerializeField] private float dashCoolTime = 2f;
+    float dashCoolTimer = 0.0f;//타이머
+
+    [Header("대시 UI")]
+    [SerializeField] GameObject objDashCoolTime;
+    [SerializeField] Image imgFill;
+    [SerializeField] TMP_Text textCoolTime;
 
     [SerializeField] KeyCode DashKey;
 
+
     private void OnDrawGizmos()//체크의 용도
     {
+        ///gameObject.SetActive(false);
+
         if(showGroundCheck == true)
         {
             Debug.DrawLine(transform.position, transform.position - new Vector3(0, groundCheckLength), colorGroundCheck);
@@ -102,6 +112,9 @@ public class MoveController : MonoBehaviour
         rigid = GetComponent<Rigidbody2D>();
         box2d = GetComponent<BoxCollider2D>();
         anim = GetComponent<Animator>();
+        dashEffect = GetComponent<TrailRenderer>();
+        dashEffect.enabled = false;
+        initUI();
     }
 
     void Start()
@@ -127,11 +140,13 @@ public class MoveController : MonoBehaviour
 
     private void dash()
     {
-        if (dashTimer == 0.0f && (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.F)))
+        if (dashTimer == 0.0f && dashCoolTimer == 0.0f && (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.F)))
         {
             //Input.GetKeyDown(DashKey);
             dashTimer = dashTime;
+            dashCoolTimer = dashCoolTime;
             verticalVelocity = 0;
+            dashEffect.enabled = true;
             //if (transform.localScale.x > 0)//왼쪽
             //{
             //    rigid.velocity = new Vector2(-dashSpeed, verticalVelocity);
@@ -164,7 +179,32 @@ public class MoveController : MonoBehaviour
             if(dashTimer < 0.0f)
             {
                 dashTimer = 0.0f;
+                dashEffect.enabled = false;
+                dashEffect.Clear(); //기존에 있던 라인이 사라짐
             }
+        }
+
+        if(dashCoolTimer > 0.0f)
+        {
+            //objDashCoolTime.SetActive(true);//이렇게 사용가능
+            if (objDashCoolTime.activeSelf == false)
+            {
+                objDashCoolTime.SetActive(true);
+            }
+
+            dashCoolTimer -= Time.deltaTime;
+            if(dashCoolTimer < 0.0f)
+            {
+                dashCoolTimer = 0.0f;
+                objDashCoolTime.SetActive(false);
+            }
+
+            //dashCoolTime = 2초, 스킬을 쓰면 0, 점점 1이 되어가야함
+            //2(타이머)/2(최대타이머) = 1, 0.5, 0
+            //0, 0.5, 1
+
+            imgFill.fillAmount = 1 - dashCoolTimer / dashCoolTime;//0, 0.5, 1
+            textCoolTime.text = dashCoolTimer.ToString("F1");//소수점 첫째 자리만 출력
         }
     }
 
@@ -316,6 +356,13 @@ public class MoveController : MonoBehaviour
     {
         anim.SetInteger("Horizontal", (int)moveDir.x);
         anim.SetBool("IsGround", isGround);
+    }
+
+    private void initUI()
+    {
+        objDashCoolTime.SetActive(false);
+        imgFill.fillAmount = 0;
+        textCoolTime.text = "";
     }
 
 }
