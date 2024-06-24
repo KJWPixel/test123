@@ -8,6 +8,8 @@ public class AttackController : MonoBehaviour
     [SerializeField] Transform trsHand;
     [SerializeField] GameObject objThrowWeapon;
     [SerializeField] Transform trsWeapon;
+    [SerializeField] Transform trsDynamic;
+    [SerializeField] Vector2 ThrowForce = new Vector2(10f, 0f);
     private void Start()
     {
         mainCam = Camera.main;//메인카메라
@@ -20,6 +22,7 @@ public class AttackController : MonoBehaviour
     void Update()
     {
         checkAim();
+        checkCreate();
     }
 
     private void checkAim()
@@ -41,8 +44,6 @@ public class AttackController : MonoBehaviour
         //}
         float angle = Quaternion.FromToRotation(transform.localScale.x < 0 ? Vector3.right : Vector3.left, fixedPos).eulerAngles.z;//?
         trsHand.rotation = Quaternion.Euler(0, 0, angle); //rotation = Quaternion을 EulerRotation로 변경
-        
-
     }
 
     private void checkCreate()
@@ -55,6 +56,14 @@ public class AttackController : MonoBehaviour
 
     private void createWeapon()
     {
-        //GameObject go = Instantiate(objThrowWeapon, );
+        GameObject go = Instantiate(objThrowWeapon, trsWeapon.position, trsWeapon.rotation, trsDynamic);
+        ThrowWeapon goSc = go.GetComponent<ThrowWeapon>();
+        bool isRight = transform.localScale.x < 0 ? true : false;
+        Vector2 fixedThrowForce = ThrowForce;
+        if(isRight == false)
+        {
+            fixedThrowForce = -ThrowForce;//x 10, y 0
+        }
+        goSc.SetForce(trsWeapon.rotation * fixedThrowForce, isRight);
     }
 }
