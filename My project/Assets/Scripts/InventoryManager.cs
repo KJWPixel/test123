@@ -9,11 +9,14 @@ public class InventoryManager : MonoBehaviour
     [SerializeField] GameObject viewInventory;//인벤토리 뷰
     [SerializeField] GameObject fabItem;//인벤토리에 생성될 프리팹
 
-    List<Transform> listTrsInventory = new List<Transform>(); 
+    [SerializeField] Transform canvasInventory;
+    public Transform CanvasInventory => canvasInventory;
+
+    List<Transform> listTrsInventory = new List<Transform>();
 
     private void Awake()
     {
-        if(Instance == null)
+        if (Instance == null)
         {
             Instance = this;
         }
@@ -29,10 +32,10 @@ public class InventoryManager : MonoBehaviour
     }
     private void initInventory()
     {
-       listTrsInventory.Clear();
+        listTrsInventory.Clear();
 
         Transform[] childs = viewInventory.GetComponentsInChildren<Transform>();//자식이 다수면 GetComponents //GetComponents는 자기자신을 포함함 
-        
+
         listTrsInventory.AddRange(childs);//1개의 데이터면 Add, 2개 이상의 데이터면 AddRange
         listTrsInventory.RemoveAt(0);     //자기자신을 제외하고 인벤토리에 있는 데이터를 담음
 
@@ -62,14 +65,28 @@ public class InventoryManager : MonoBehaviour
     private int getEmptyItemSlot()
     {
         int count = listTrsInventory.Count;
-        for(int iNum = 0; iNum < count; ++iNum)
+        for (int iNum = 0; iNum < count; ++iNum)
         {
             Transform trsSlot = listTrsInventory[iNum];
-            if(trsSlot.childCount == 0)
+            if (trsSlot.childCount == 0)
             {
                 return iNum;
             }
         }
         return -1;
+    }
+
+    public bool GetItem(string _idx)
+    {
+        int slotNum = getEmptyItemSlot();
+        if(slotNum == -1)
+        {
+            return false;
+        }
+
+        GameObject go = Instantiate(fabItem, listTrsInventory[slotNum]);
+        //오브젝트에게 너는 _idx번호가 너의 정보 데이터야
+        return true;
+        
     }
 }
