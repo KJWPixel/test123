@@ -26,6 +26,7 @@ public class MoveController : MonoBehaviour
 
     [SerializeField] bool isGround;//인스펙터에서 플레이어가 플랫폼타일에 착지 했는지
     bool isJump;
+    bool twoJump;
 
     Camera camMain;
 
@@ -132,6 +133,7 @@ public class MoveController : MonoBehaviour
         moving();
         checkAim();  
         jump();
+        doubleJump();
 
         chedkGravity();
 
@@ -308,7 +310,9 @@ public class MoveController : MonoBehaviour
         if(Input.GetKeyDown(KeyCode.Space) == true)
         {
             isJump = true;
+            
         }
+        twoJump = false;
     }
 
     private void chedkGravity()
@@ -363,6 +367,15 @@ public class MoveController : MonoBehaviour
         objDashCoolTime.SetActive(false);
         imgFill.fillAmount = 0;
         textCoolTime.text = "";
+    }
+
+    private void doubleJump()
+    {
+       if(isGround == false && isJump == false && twoJump == false && Input.GetKeyDown(KeyCode.Space))
+        {
+            verticalVelocity = jumpForce;
+            twoJump = true;
+        }
     }
 
 }
