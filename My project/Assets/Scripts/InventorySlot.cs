@@ -29,7 +29,7 @@ public class InventorySlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 
     /// <summary>
     /// 이벤트 시스템으로 인해 드래그 되는 대상이 이 스크립트 위에서 드롭되게 되면 
-    /// 해당 드롭 오브젝트를 나으 ㅣ자식으로 변경합니다.
+    /// 해당 드롭 오브젝트를 나의 자식으로 변경합니다.
     /// </summary>
     /// <param name="eventData"></param>
     public void OnDrop(PointerEventData eventData)

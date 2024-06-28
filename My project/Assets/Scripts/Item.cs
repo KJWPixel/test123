@@ -8,7 +8,7 @@ public class Item : MonoBehaviour
     InventoryManager inventoryManager;
     [SerializeField] string itemIdx;
 
-    private void Awake()
+    private void Start()
     {
         inventoryManager = InventoryManager.Instance;
 
@@ -32,7 +32,10 @@ public class Item : MonoBehaviour
     {
         if(collision.gameObject.layer == LayerMask.NameToLayer("Player"))//닿은대상이 플레이어라면
         {
-            inventoryManager.GetItem(itemIdx);
+            if(inventoryManager.GetItem(itemIdx) == true)
+            {
+                Destroy(gameObject);
+            }
             //인벤토리 매니저에게 내가 습득되는 확인
         }
     }

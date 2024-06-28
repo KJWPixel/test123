@@ -86,6 +86,8 @@ public class InventoryManager : MonoBehaviour
 
         GameObject go = Instantiate(fabItem, listTrsInventory[slotNum]);
         //오브젝트에게 너는 _idx번호가 너의 정보 데이터야
+        ItemUI goSc = go.GetComponent<ItemUI>();
+        goSc.SetItem(_idx);
         return true;
         
     }

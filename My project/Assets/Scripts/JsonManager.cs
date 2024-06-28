@@ -35,13 +35,16 @@ public class JsonManager : MonoBehaviour
     {
         TextAsset itemData = Resources.Load("ItemData") as TextAsset;
         itemDatas = JsonConvert.DeserializeObject<List<cItemData>>(itemData.ToString());
+
+        //cWeapon data = new cWeapon(); //중요
+        //itemDatas.Add(data);
     }
 
-    public string GetNameFromIdx(string _idx)
+    public string GetSpriteNameFromIdx(string _idx)//큐플 무명 클래스
     {
         if(itemDatas == null) return string.Empty;
 
-        return itemDatas.Find(x => x.idx == _idx).sprite;
+        return itemDatas.Find(x => x.idx == _idx).sprite;//람다식, Find  c# > c++로 변환하는 과정: il2cpp
     }
 }
 

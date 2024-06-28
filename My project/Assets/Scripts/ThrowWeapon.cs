@@ -29,6 +29,7 @@ public class ThrowWeapon : MonoBehaviour
         if (isDone == true) return;
 
         transform.Rotate(new Vector3(0, 0, right == true ? -360f : 360f) * Time.deltaTime);
+        Destroy(gameObject, 3f);
     }
 
     public void SetForce(Vector2 _force, bool _isRight)

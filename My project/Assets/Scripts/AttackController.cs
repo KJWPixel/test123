@@ -51,7 +51,8 @@ public class AttackController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Mouse1))
         {
             createWeapon();
-        }
+            
+        }       
     }
 
     private void createWeapon()
@@ -60,10 +61,10 @@ public class AttackController : MonoBehaviour
         ThrowWeapon goSc = go.GetComponent<ThrowWeapon>();
         bool isRight = transform.localScale.x < 0 ? true : false;
         Vector2 fixedThrowForce = ThrowForce;
-        if(isRight == false)
+        if (isRight == false)
         {
             fixedThrowForce = -ThrowForce;//x 10, y 0
         }
         goSc.SetForce(trsWeapon.rotation * fixedThrowForce, isRight);
-    }
+    }    
 }
